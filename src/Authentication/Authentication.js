@@ -1,32 +1,60 @@
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _EventEmitter2 = require('../EventEmitter');
+
+var _EventEmitter3 = _interopRequireDefault(_EventEmitter2);
+
+var _JSO = require('../JSO');
+
+var _JSO2 = _interopRequireDefault(_JSO);
+
+var _utils = require('../utils');
+
+var _utils2 = _interopRequireDefault(_utils);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 // import ExpiredTokenError from '../errors/ExpiredTokenError'
-
-import EventEmitter from '../EventEmitter'
-import JSO from '../JSO'
-import utils from '../utils'
-
 
 // Work in progress
 
-export default class Authentication extends EventEmitter {
+var Authentication = function (_EventEmitter) {
+  _inherits(Authentication, _EventEmitter);
 
-  constructor(config) {
-    super()
-		this.jso = new JSO(config)
-    this.fetcher = new Fetcher(this.jso)
-    this.state = 'unauthenticated'
-	}
+  function Authentication(config) {
+    _classCallCheck(this, Authentication);
 
-  authenticate() {
-    return this.jso.getToken()
+    var _this = _possibleConstructorReturn(this, (Authentication.__proto__ || Object.getPrototypeOf(Authentication)).call(this));
+
+    _this.jso = new _JSO2.default(config);
+    _this.fetcher = new Fetcher(_this.jso);
+    _this.state = 'unauthenticated';
+    return _this;
   }
 
-  logout() {
+  _createClass(Authentication, [{
+    key: 'authenticate',
+    value: function authenticate() {
+      return this.jso.getToken();
+    }
+  }, {
+    key: 'logout',
+    value: function logout() {}
+  }]);
 
-  }
-
-}
-
+  return Authentication;
+}(_EventEmitter3.default);
 
 //
 //
@@ -245,3 +273,6 @@ export default class Authentication extends EventEmitter {
 // 	return Authentication;
 //
 // });
+
+
+exports.default = Authentication;

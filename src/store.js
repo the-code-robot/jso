@@ -1,127 +1,164 @@
-import utils from './utils'
+"use strict";
 
-class Store {
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 
-	constructor() {
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _utils = require("./utils");
+
+var _utils2 = _interopRequireDefault(_utils);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Store = function () {
+	function Store() {
+		_classCallCheck(this, Store);
 	}
 
 	/*
-		saveState stores an object with an Identifier.
-		TODO: Ensure that both localstorage and JSON encoding has fallbacks for ancient browsers.
-		In the state object, we put the request object, plus these parameters:
-		  * restoreHash
-		  * providerID
-		  * scopes
-
-	 */
-	saveState(state, obj) {
-		localStorage.setItem("state-" + state, JSON.stringify(obj))
-	}
-
-	/**
-	 * getStage()  returns the state object, but also removes it.
-	 * @type {Object}
-	 */
-	getState(state) {
-		// log("getState (" + state+ ")");
-		var obj = JSON.parse(localStorage.getItem("state-" + state))
-		localStorage.removeItem("state-" + state)
-		return obj
-	}
+ 	saveState stores an object with an Identifier.
+ 	TODO: Ensure that both localstorage and JSON encoding has fallbacks for ancient browsers.
+ 	In the state object, we put the request object, plus these parameters:
+ 	  * restoreHash
+ 	  * providerID
+ 	  * scopes
+ 	 */
 
 
-	/*
-	 * Checks if a token, has includes a specific scope.
-	 * If token has no scope at all, false is returned.
-	 */
-	hasScope(token, scope) {
-		var i
-		if (!token.scopes) return false
-		for(i = 0; i < token.scopes.length; i++) {
-			if (token.scopes[i] === scope) return true
+	_createClass(Store, [{
+		key: "saveState",
+		value: function saveState(state, obj) {
+			localStorage.setItem("state-" + state, JSON.stringify(obj));
 		}
-		return false
-	}
 
-	/*
-	 * Takes an array of tokens, and removes the ones that
-	 * are expired, and the ones that do not meet a scopes requirement.
-	 */
-	filterTokens(tokens, scopes) {
-		var i, j,
-			result = [],
-			now = utils.epoch(),
-			usethis
+		/**
+   * getStage()  returns the state object, but also removes it.
+   * @type {Object}
+   */
 
-		if (!scopes) scopes = []
+	}, {
+		key: "getState",
+		value: function getState(state) {
+			// log("getState (" + state+ ")");
+			var obj = JSON.parse(localStorage.getItem("state-" + state));
+			localStorage.removeItem("state-" + state);
+			return obj;
+		}
 
-		for(i = 0; i < tokens.length; i++) {
-			usethis = true
+		/*
+   * Checks if a token, has includes a specific scope.
+   * If token has no scope at all, false is returned.
+   */
 
-			// Filter out expired tokens. Tokens that is expired in 1 second from now.
-			if (tokens[i].expires && tokens[i].expires < (now+1)) usethis = false
-
-			// Filter out this token if not all scope requirements are met
-			for(j = 0; j < scopes.length; j++) {
-				if (!this.hasScope(tokens[i], scopes[j])) usethis = false
+	}, {
+		key: "hasScope",
+		value: function hasScope(token, scope) {
+			var i;
+			if (!token.scopes) return false;
+			for (i = 0; i < token.scopes.length; i++) {
+				if (token.scopes[i] === scope) return true;
 			}
-
-			if (usethis) result.push(tokens[i])
+			return false;
 		}
-		return result
-	}
 
+		/*
+   * Takes an array of tokens, and removes the ones that
+   * are expired, and the ones that do not meet a scopes requirement.
+   */
 
-	/*
-	 * saveTokens() stores a list of tokens for a provider.
+	}, {
+		key: "filterTokens",
+		value: function filterTokens(tokens, scopes) {
+			var i,
+			    j,
+			    result = [],
+			    now = _utils2.default.epoch(),
+			    usethis;
 
-		Usually the tokens stored are a plain Access token plus:
-		  * expires : time that the token expires
-		  * providerID: the provider of the access token?
-		  * scopes: an array with the scopes (not string)
-	 */
-	saveTokens(provider, tokens) {
-		// log("Save Tokens (" + provider+ ")");
-		localStorage.setItem("tokens-" + provider, JSON.stringify(tokens))
-	}
+			if (!scopes) scopes = [];
 
-	getTokens(provider) {
-		// log("Get Tokens (" + provider+ ")");
-		var tokens = JSON.parse(localStorage.getItem("tokens-" + provider))
-		if (!tokens) tokens = []
+			for (i = 0; i < tokens.length; i++) {
+				usethis = true;
 
-		utils.log("Token found when loooking up provider " + provider + " in store " + window.location.href, tokens)
-		return tokens
-	}
+				// Filter out expired tokens. Tokens that is expired in 1 second from now.
+				if (tokens[i].expires && tokens[i].expires < now + 1) usethis = false;
 
-	wipeTokens(provider) {
-		localStorage.removeItem("tokens-" + provider)
-	}
+				// Filter out this token if not all scope requirements are met
+				for (j = 0; j < scopes.length; j++) {
+					if (!this.hasScope(tokens[i], scopes[j])) usethis = false;
+				}
 
-	/*
-	 * Save a single token for a provider.
-	 * This also cleans up expired tokens for the same provider.
-	 */
-	saveToken(provider, token) {
-		var tokens = this.getTokens(provider)
-		tokens = this.filterTokens(tokens)
-		tokens.push(token)
-		this.saveTokens(provider, tokens)
-	}
+				if (usethis) result.push(tokens[i]);
+			}
+			return result;
+		}
 
-	/*
-	 * Get a token if exists for a provider with a set of scopes.
-	 * The scopes parameter is OPTIONAL.
-	 */
-	getToken(provider, scopes) {
-		var tokens = this.getTokens(provider)
-		tokens = this.filterTokens(tokens, scopes)
-		if (tokens.length < 1) return null
-		return tokens[0]
-	};
+		/*
+   * saveTokens() stores a list of tokens for a provider.
+  		Usually the tokens stored are a plain Access token plus:
+  	  * expires : time that the token expires
+  	  * providerID: the provider of the access token?
+  	  * scopes: an array with the scopes (not string)
+   */
 
-}
+	}, {
+		key: "saveTokens",
+		value: function saveTokens(provider, tokens) {
+			// log("Save Tokens (" + provider+ ")");
+			localStorage.setItem("tokens-" + provider, JSON.stringify(tokens));
+		}
+	}, {
+		key: "getTokens",
+		value: function getTokens(provider) {
+			// log("Get Tokens (" + provider+ ")");
+			var tokens = JSON.parse(localStorage.getItem("tokens-" + provider));
+			if (!tokens) tokens = [];
 
-var s = new Store()
+			_utils2.default.log("Token found when loooking up provider " + provider + " in store " + window.location.href, tokens);
+			return tokens;
+		}
+	}, {
+		key: "wipeTokens",
+		value: function wipeTokens(provider) {
+			localStorage.removeItem("tokens-" + provider);
+		}
 
-export default s
+		/*
+   * Save a single token for a provider.
+   * This also cleans up expired tokens for the same provider.
+   */
+
+	}, {
+		key: "saveToken",
+		value: function saveToken(provider, token) {
+			var tokens = this.getTokens(provider);
+			tokens = this.filterTokens(tokens);
+			tokens.push(token);
+			this.saveTokens(provider, tokens);
+		}
+
+		/*
+   * Get a token if exists for a provider with a set of scopes.
+   * The scopes parameter is OPTIONAL.
+   */
+
+	}, {
+		key: "getToken",
+		value: function getToken(provider, scopes) {
+			var tokens = this.getTokens(provider);
+			tokens = this.filterTokens(tokens, scopes);
+			if (tokens.length < 1) return null;
+			return tokens[0];
+		}
+	}]);
+
+	return Store;
+}();
+
+var s = new Store();
+
+exports.default = s;
